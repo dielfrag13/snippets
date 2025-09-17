@@ -8,24 +8,13 @@ public:
     // declare the constructor (no parameters)
     // no return type -- not even void
     Foo();
-    
     // Constructor overloading -- this one takes one int
-    // the term here is 'delegation'. 
-    Foo(int x); 
+    Foo(int x);   // the term here is 'delegation'. 
 
-
-
-    int public_var1;
-
-
-    // usual method
-    void method_1(std::string);
-
+    void method_1(std::string);  // usual method
 
     // declare the destructor
     ~Foo();
-
-
 
 }; // classes end in semicolon?
 
