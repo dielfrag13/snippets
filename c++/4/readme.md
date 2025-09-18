@@ -92,9 +92,16 @@ delete b;
 
 ## Make it, run it
 ```sh
-kbuchmil@TAMARIND:~/git/snippets/c++/3$ g++ -g -Wall example.cpp -o example
-kbuchmil@TAMARIND:~/git/snippets/c++/3$ ./example
-Child
-Child
-Child
+kbuchmil@TAMARIND:~/git/snippets/c++/4$ g++ -g -Wall example.cpp -o example
+kbuchmil@TAMARIND:~/git/snippets/c++/4$ ./example
+Base constructed
+Derived constructed
+Base setting id to 1!
+Base constructed
+Derived constructed
+Base setting id to 2!
+derived deconstructing id 2!
+base deconstructing id 2!
+derived deconstructing id 1!
+base deconstructing id 1!
 ```
