@@ -27,6 +27,7 @@
         // private_member is not accessible
     };
 ```
+
 *Protected Inheritance:* With protected inheritance, public and protected members of the base class become protected members in the derived class. This means they are accessible within the derived class and its further derived classes, but not from outside the derived class. Private members remain inaccessible. This type of inheritance is used when you want the derived class to inherit the implementation but not expose the public interface of the base class to external users. 
 ```C++
 
@@ -79,16 +80,14 @@ delete b;
 // Base dtor
 ```
 
-the above will only run 
-
 * Virtual dispatch doesn't work during construction. Only the base version of a method runs, because dynamic dispatch cannot occur, because the derived part of the object isn't built yet. 
 
 ### other random notes
 
 * private members of a base class can't be directly accessed by derived classes. 
 * `protected` members, however, can be. 
-* to access private members of a base class, you must create setters/getters in the base class, and presumably not override those setters and getters in subclasses. 
-* implementations of methods directly in a class definition are implicitly inline. 
+* to access private members of a base class, you must create setters/getters in the base class, and presumably not override those setters and getters in subclasses. you must inherit publicly from the base class to get these accessers.
+* implementations of methods directly in a class definition are implicitly inline. Just FYI. 
 
 
 ## Make it, run it
