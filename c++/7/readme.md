@@ -196,7 +196,7 @@ struct Baz {
 };
 ```
 
-
+Finally: initializer list ordering matters! It should follow the order of member declarations in the struct/class. 
 
 
 

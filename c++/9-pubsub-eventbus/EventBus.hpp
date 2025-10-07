@@ -12,6 +12,7 @@ namespace eng {
 
 class EventBus {
     public:
+    
     using Handler = std::function<void(const Event&)>;
     using HandlerId = std::uint64_t;
 
