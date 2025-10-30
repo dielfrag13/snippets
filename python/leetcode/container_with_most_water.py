@@ -28,7 +28,11 @@ def maxArea(heights: List[int]) -> int:
         else:
             pl += 1
 
-    # this passes all tests, but i don't understand why it works...
+    # the key insight: we have two dimensions, the distance bewteen bars, and the height of the bars.
+    # Every iteration, we will lose one width, lessening area. However, in switching bars, we may
+    # get a better, higher bar. Switching from the tallest bar will only negatively impact us, as it
+    # may result in an even shorter bar. however, switching from the shorter bar may positively impact us
+    # as it may grow in height faster than the loss in width. This is the key insight.
     return best_area
 
 
