@@ -190,7 +190,18 @@ class RobotVacuum:
 		start: Tuple[int, int] = (0, 0),
 		start_dir: str = "N",
 		visualizer: Optional[RoomVisualizer] = None,
+		auto_clean_start: bool = True,
 	) -> None:
+		"""Create a RobotVacuum.
+
+		Args:
+			room_map: grid of characters ('#' walls, 'X' objects, '.' open)
+			start: (row, col) start position
+			start_dir: starting facing direction 'N','E','S','W'
+			visualizer: optional RoomVisualizer to update after actions
+			auto_clean_start: if True, mark the starting cell as cleaned
+		"""
+
 		self.room_map = [list(row) for row in room_map]
 		self.rows = len(self.room_map)
 		self.cols = len(self.room_map[0]) if self.rows else 0
@@ -198,8 +209,9 @@ class RobotVacuum:
 		assert 0 <= self.r < self.rows and 0 <= self.c < self.cols, "start out of bounds"
 		self.dir_idx = self.DIRS.index(start_dir)
 		self.cleaned: Set[Tuple[int, int]] = set()
-		# mark starting cell as cleaned if it's open
-		if self.room_map[self.r][self.c] not in ("#", "X"):
+
+		# optionally mark starting cell as cleaned
+		if auto_clean_start and self.room_map[self.r][self.c] not in ("#", "X"):
 			self.cleaned.add((self.r, self.c))
 
 		self.visualizer = visualizer
@@ -223,8 +235,14 @@ class RobotVacuum:
 		return Status.OK
 
 	def forward(self) -> Status:
+		"""Move forward one cell in the current facing direction.
+
+		Forward no longer automatically cleans. It only moves the robot.
+		Returns Status.OK on success, or BLOCKED/OUT_OF_BOUNDS on failure.
+		"""
 		dr, dc = self.DELTAS[self.current_dir]
 		nr, nc = self.r + dr, self.c + dc
+
 		# bounds check
 		if not (0 <= nr < self.rows and 0 <= nc < self.cols):
 			return Status.OUT_OF_BOUNDS
@@ -233,11 +251,42 @@ class RobotVacuum:
 		if cell in ("#", "X"):
 			return Status.BLOCKED
 
-		if (nr, nc) in self.cleaned:
+		# move (we allow moving into cleaned cells to support backtracking)
+		self.r, self.c = nr, nc
+		if self.visualizer:
+			self.visualizer.update((self.r, self.c), self.current_dir, self.cleaned)
+		return Status.OK
+
+	def backward(self) -> Status:
+		"""Move backward one cell (opposite of current facing direction).
+
+		Useful for simple backtracking without changing facing direction.
+		"""
+		# opposite direction = rotate 180 degrees delta
+		dr, dc = self.DELTAS[self.current_dir]
+		nr, nc = self.r - dr, self.c - dc
+
+		if not (0 <= nr < self.rows and 0 <= nc < self.cols):
+			return Status.OUT_OF_BOUNDS
+
+		cell = self.room_map[nr][nc]
+		if cell in ("#", "X"):
+			return Status.BLOCKED
+
+		self.r, self.c = nr, nc
+		if self.visualizer:
+			self.visualizer.update((self.r, self.c), self.current_dir, self.cleaned)
+		return Status.OK
+
+	def clean(self) -> Status:
+		"""Mark the current cell as cleaned. Returns ALREADY_CLEANED if it was cleaned before."""
+		if (self.r, self.c) in self.cleaned:
 			return Status.ALREADY_CLEANED
 
-		# move and mark cleaned
-		self.r, self.c = nr, nc
+		if self.room_map[self.r][self.c] in ("#", "X"):
+			# shouldn't happen: cleaning an impassable cell is a no-op (or treat as BLOCKED)
+			return Status.BLOCKED
+
 		self.cleaned.add((self.r, self.c))
 		if self.visualizer:
 			self.visualizer.update((self.r, self.c), self.current_dir, self.cleaned)
