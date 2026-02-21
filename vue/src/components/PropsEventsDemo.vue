@@ -23,16 +23,19 @@ var ChildEditor = {
     }
   },
   data: function () {
+    // Initializes child-local editable state from the parent-provided prop.
     return {
       localValue: this.initialMessage
     };
   },
   watch: {
+    // Keeps local input in sync when parent message changes externally.
     initialMessage: function (nextValue) {
       this.localValue = nextValue;
     }
   },
   methods: {
+    // Emits the updated value so the parent can own and update source-of-truth state.
     emitChange: function () {
       this.$emit('message-change', this.localValue);
     }
@@ -54,11 +57,13 @@ export default {
     ChildEditor: ChildEditor
   },
   data: function () {
+    // Stores the message that is displayed by the parent component.
     return {
       parentMessage: 'Hello from parent'
     };
   },
   methods: {
+    // Receives child event payload and updates parent-owned message state.
     onMessageChange: function (nextMessage) {
       this.parentMessage = nextMessage;
     }

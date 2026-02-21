@@ -29,6 +29,7 @@
 export default {
   name: 'ConditionalListDemo',
   data: function () {
+    // Defines list input state, visibility toggle, id counter, and starter items.
     return {
       newItem: '',
       showList: true,
@@ -40,6 +41,7 @@ export default {
     };
   },
   methods: {
+    // Adds a trimmed input value to the list and resets the input field.
     addItem: function () {
       var trimmed = this.newItem.trim();
       if (!trimmed) {

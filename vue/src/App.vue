@@ -23,11 +23,13 @@
           :key="tab.key"
           class="tab-btn"
           :class="{ active: activeTab === tab.key }"
-          @click="activeTab = tab.key"
+          @click="setActiveTab(tab.key)"
         >
           {{ tab.label }}
         </button>
       </div>
+
+      <p class="remembered-tab">Last remembered tab: {{ activeTabLabel }}</p>
 
       <div class="tab-panel">
         <PropsEventsDemo v-show="activeTab === 'props'" />
@@ -43,6 +45,8 @@ import PropsEventsDemo from './components/PropsEventsDemo.vue';
 import ComputedWatchDemo from './components/ComputedWatchDemo.vue';
 import ConditionalListDemo from './components/ConditionalListDemo.vue';
 
+var TAB_STORAGE_KEY = 'vue2-reactive-playground.active-tab';
+
 export default {
   name: 'App',
   components: {
@@ -51,6 +55,7 @@ export default {
     ConditionalListDemo: ConditionalListDemo
   },
   data: function () {
+    // Provides top-level state used by the intro UI and demo tab switcher.
     return {
       title: 'Vue 2 Reactive UI',
       name: 'World',
@@ -63,11 +68,62 @@ export default {
       ]
     };
   },
+  created: function () {
+    // Restores the last selected tab from localStorage when the app loads.
+    var persistedTab = this.loadActiveTab();
+    if (persistedTab) {
+      this.activeTab = persistedTab;
+    }
+  },
   computed: {
+    // Returns a small message proving that computed properties react to changes.
     computedMessage: function () {
       return this.count % 2 === 0
         ? 'Even count: reactive updates are working.'
         : 'Odd count: still reactive!';
+    },
+
+    // Returns the display label for the currently active (and remembered) tab.
+    activeTabLabel: function () {
+      var selectedTab = this.tabs.find(
+        function (tab) {
+          return tab.key === this.activeTab;
+        }.bind(this)
+      );
+
+      return selectedTab ? selectedTab.label : this.activeTab;
+    }
+  },
+  watch: {
+    // Persists the currently selected tab whenever it changes.
+    activeTab: function (nextTab) {
+      this.saveActiveTab(nextTab);
+    }
+  },
+  methods: {
+    // Handles tab button clicks and updates the visible demo section.
+    setActiveTab: function (tabKey) {
+      if (this.isValidTab(tabKey)) {
+        this.activeTab = tabKey;
+      }
+    },
+
+    // Validates that a tab key exists in the configured tabs list.
+    isValidTab: function (tabKey) {
+      return this.tabs.some(function (tab) {
+        return tab.key === tabKey;
+      });
+    },
+
+    // Reads tab state from localStorage and returns null when missing/invalid.
+    loadActiveTab: function () {
+      var storedValue = localStorage.getItem(TAB_STORAGE_KEY);
+      return this.isValidTab(storedValue) ? storedValue : null;
+    },
+
+    // Writes the selected tab key to localStorage for future sessions.
+    saveActiveTab: function (tabKey) {
+      localStorage.setItem(TAB_STORAGE_KEY, tabKey);
     }
   }
 };
@@ -134,6 +190,12 @@ input {
 
 .tab-panel {
   margin-top: 6px;
+}
+
+.remembered-tab {
+  margin: 2px 0 0;
+  color: #555;
+  font-size: 14px;
 }
 
 button {

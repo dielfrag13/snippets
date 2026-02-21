@@ -16,17 +16,20 @@
 export default {
   name: 'ComputedWatchDemo',
   data: function () {
+    // Holds raw input and a readable log produced by the watcher.
     return {
       celsius: 20,
       watchLog: 'Waiting for change...'
     };
   },
   computed: {
+    // Converts Celsius input to Fahrenheit and formats to one decimal place.
     fahrenheit: function () {
       return ((this.celsius * 9) / 5 + 32).toFixed(1);
     }
   },
   watch: {
+    // Records transitions whenever the source value changes.
     celsius: function (nextValue, prevValue) {
       this.watchLog = 'celsius changed from ' + prevValue + ' to ' + nextValue;
     }
