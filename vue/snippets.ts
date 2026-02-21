@@ -6,8 +6,37 @@
 */
 
 // ---------------------------------
+// 0) Decision cheatsheet (what to open when)
+// ---------------------------------
+
+// This is different from a table of contents:
+// - TOC tells you where things are.
+// - Decision cheatsheet tells you what to use for a specific problem.
+
+// If you need to define reusable behavior -> start at section 1.
+// If your function call sites feel messy -> section 2.
+// If your data shape is unclear -> section 3.
+// If branching logic is getting hard to follow -> section 4.
+// If you're transforming collections -> section 5.
+// If your types feel repetitive or too loose -> section 6.
+// If values should come from a fixed set -> section 7.
+// If state + behavior should stay bundled -> section 8.
+// If one algorithm should work for many types safely -> section 9.
+// If logic involves network/timers/promises -> section 10.
+// If undefined/null data causes runtime errors -> section 11.
+// If you need better lookup/uniqueness structures -> section 12.
+// If failures need controlled handling -> section 13.
+// If building Vue 2 components/patterns -> section 14.
+// If choosing app navigation strategy -> section 15.
+// If deciding what to expose from this file -> section 16.
+
+// ---------------------------------
 // 1) Basic function definitions
 // ---------------------------------
+
+// Used for: defining reusable behavior with named/function-expression/arrow styles.
+// Solves: copy/paste logic and unclear intent by centralizing behavior into callable units.
+// Mindset: choose readability first; pick one style consistently unless syntax needs differ.
 
 // Named function declaration.
 function add(a: number, b: number): number {
@@ -32,6 +61,10 @@ const divide = (a: number, b: number): number => {
 // 2) Parameters and return patterns
 // ---------------------------------
 
+// Used for: controlling function inputs (optional/default/rest) and output typing.
+// Solves: brittle call sites and argument-count confusion.
+// Mindset: design function signatures as mini APIs with safe defaults.
+
 // Optional parameter (?) and default parameter (=).
 function greet(name: string = 'World', punctuation?: string): string {
   const suffix = punctuation ? punctuation : '!';
@@ -46,6 +79,10 @@ function sumAll(...values: number[]): number {
 // ---------------------------------
 // 3) Objects, arrays, and tuples
 // ---------------------------------
+
+// Used for: modeling structured data (objects), collections (arrays), and fixed-shape pairs (tuples).
+// Solves: loose data handling by making shape/intent explicit.
+// Mindset: pick the narrowest shape that matches real constraints.
 
 interface User {
   id: number;
@@ -77,6 +114,10 @@ const { name: userName, isAdmin } = updatedUser;
 // 4) Conditionals and switch
 // ---------------------------------
 
+// Used for: branching behavior based on state or input values.
+// Solves: unclear control flow by making decision logic explicit.
+// Mindset: prefer simple, exhaustive branches over clever one-liners.
+
 function roleLabel(role: 'viewer' | 'editor' | 'admin'): string {
   switch (role) {
     case 'viewer':
@@ -95,6 +136,10 @@ const accessMessage = isAdmin ? 'Admin access enabled' : 'Standard access';
 // ---------------------------------
 // 5) Loops and iteration helpers
 // ---------------------------------
+
+// Used for: traversing and transforming collections.
+// Solves: manual repetitive logic and ad-hoc aggregation code.
+// Mindset: use `map/filter/reduce` for transformations; loops for side-effect-heavy flows.
 
 for (let i = 0; i < numbers.length; i += 1) {
   // Classic index-based loop.
@@ -121,8 +166,19 @@ const totalNumbers = numbers.reduce((total, value) => total + value, 0);
 // 6) Type aliases, unions, intersections
 // ---------------------------------
 
+// Used for: naming complex types and composing multiple type possibilities.
+// Solves: duplicated or hard-to-read type signatures across code.
+// Mindset: model real-world variability explicitly instead of using `any`.
+
+// Type alias: gives a reusable name to a type expression.
+// Here, Id can be either a string or a number.
 type Id = string | number;
 
+// Generic type alias:
+// - `<T>` declares a type parameter named T.
+// - It looks template-like, but this is type parameterization (not string templating).
+// - T is just a placeholder chosen by the author; it is not built in.
+// - You can rename it to something clearer (for example `<DataType>`).
 type ApiSuccess<T> = {
   ok: true;
   data: T;
@@ -133,7 +189,16 @@ type ApiFailure = {
   error: string;
 };
 
+// Generic union:
+// - Success branch carries `data: T`
+// - Failure branch carries `error: string`
 type ApiResult<T> = ApiSuccess<T> | ApiFailure;
+
+// Examples of "where T comes from":
+// You provide T at usage time by writing ApiSuccess<SomeType>.
+type ExampleStringSuccess = ApiSuccess<string>;
+type ExampleUserSuccess = ApiSuccess<User>;
+type ExampleNumberArrayResult = ApiResult<number[]>;
 
 type Timestamped = {
   createdAt: Date;
@@ -149,6 +214,10 @@ function parseId(id: Id): string {
 // 7) Enums and literal unions
 // ---------------------------------
 
+// Used for: constraining values to a small known set.
+// Solves: typo-prone string values and inconsistent status/level vocabularies.
+// Mindset: make invalid states unrepresentable with narrow value sets.
+
 enum LogLevel {
   Info = 'info',
   Warn = 'warn',
@@ -156,12 +225,19 @@ enum LogLevel {
 }
 
 function logMessage(level: LogLevel, message: string): void {
+  // Backticks (`...`) create a template literal string.
+  // `${...}` injects expressions into that string.
+  // This solves string concatenation noise and improves readability.
   console.log(`[${level}] ${message}`);
 }
 
 // ---------------------------------
 // 8) Classes and access modifiers
 // ---------------------------------
+
+// Used for: bundling related state + behavior with visibility rules (`private`, etc).
+// Solves: scattered state mutation by centralizing invariants in methods.
+// Mindset: use classes when object identity/lifecycle matters; otherwise prefer plain functions/objects.
 
 class Counter {
   private count: number;
@@ -183,6 +259,11 @@ class Counter {
 // 9) Generics
 // ---------------------------------
 
+// Used for: writing reusable typed logic without losing type safety.
+// Solves: duplicate implementations for different types and overuse of `any`.
+// Mindset (use): when algorithm is identical across types but shape should remain precise.
+// Mindset (avoid): when only one concrete type is ever expected (keep it simple then).
+
 function identity<T>(value: T): T {
   return value;
 }
@@ -197,6 +278,10 @@ void firstUser;
 // ---------------------------------
 // 10) Async/await and Promise
 // ---------------------------------
+
+// Used for: modeling asynchronous work (network, timers, file/IO operations).
+// Solves: callback nesting and unreadable async control flow.
+// Mindset: treat async flows as data pipelines with explicit success/failure handling.
 
 function wait(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -222,6 +307,10 @@ async function runAsyncExample(): Promise<void> {
 // 11) Null handling and optional chaining
 // ---------------------------------
 
+// Used for: safely reading potentially missing values and setting sensible fallbacks.
+// Solves: runtime crashes from null/undefined access.
+// Mindset: assume incomplete data at boundaries and guard intentionally.
+
 type Settings = {
   theme?: {
     mode?: 'light' | 'dark';
@@ -241,6 +330,10 @@ void resolvedTheme;
 // 12) Map/Set examples
 // ---------------------------------
 
+// Used for: keyed lookup collections (`Map`) and uniqueness constraints (`Set`).
+// Solves: O(n) repeated array scans and duplicate-value bugs.
+// Mindset: pick data structures for access pattern, not habit.
+
 const countsByWord = new Map<string, number>();
 countsByWord.set('vue', 2);
 countsByWord.set('typescript', 1);
@@ -252,6 +345,10 @@ void uniqueTags;
 // ---------------------------------
 // 13) Try/catch/finally
 // ---------------------------------
+
+// Used for: controlled error handling around risky operations.
+// Solves: uncaught exceptions that crash flows without context.
+// Mindset: fail predictably; log actionable context; recover when appropriate.
 
 function parseJsonSafely(jsonText: string): unknown {
   try {
@@ -268,6 +365,10 @@ function parseJsonSafely(jsonText: string): unknown {
 // ---------------------------------
 // 14) Vue 2 specific patterns
 // ---------------------------------
+
+// Used for: Vue 2 component architecture (Options API, directives, events, slots).
+// Solves: inconsistent component communication and state ownership.
+// Mindset: props down, events up, and keep each component focused.
 
 // Vue 2 uses the Options API with `data` as a function that returns per-instance state.
 const vue2OptionsApiSnippet = `
@@ -393,6 +494,10 @@ const vue2EventModifierSnippet = `
 // ---------------------------------
 // 15) Navigation pattern: no vue-router vs vue-router
 // ---------------------------------
+
+// Used for: choosing app navigation strategy based on complexity and URL needs.
+// Solves: overengineering tiny apps or underengineering growing ones.
+// Mindset: start minimal, switch to router when URL-state and route lifecycle become requirements.
 
 // No-vue-router option:
 // - Best for very small apps, demos, or internal tools.
@@ -530,6 +635,10 @@ export default {
 // ---------------------------------
 // 16) Module exports
 // ---------------------------------
+
+// Used for: exposing selected symbols for import in other files.
+// Solves: accidental globals and unclear module boundaries.
+// Mindset: export intentionally; keep module surface area small and purposeful.
 
 export {
   add,
