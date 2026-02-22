@@ -158,6 +158,7 @@ Open: `http://localhost:8080`
 - JavaScript/TypeScript syntax reference snippets: `snippets.ts`
 - Debugging playbook and mindset glossary: `error-glossary.md`
 - Daily debugging behaviors: `top-10-debugging-habits.md`
+- Annotated single-file component walkthrough: `vue-sfc-walkthrough.vue`
 
 You can split additional demos into new components under `src/components/` and import them into `App.vue`.
 
@@ -172,6 +173,50 @@ Function/method comments are included in:
 - `src/components/ConditionalListDemo.vue`
 
 These comments describe each function's purpose and how state/data flows through it.
+
+## How to read a .vue file (beginner primer)
+
+A Vue Single File Component (SFC) typically has three top-level blocks:
+
+- `<template>`: structure (HTML-like markup)
+- `<script>`: behavior (state, methods, computed, watchers)
+- `<style>`: presentation (CSS)
+
+You can think of it as: **what it looks like** + **how it behaves** + **how it is styled**.
+
+### Common tags you will see often
+
+- `<div>`: generic layout container
+- `<section>`: semantic grouped section
+- `<h1>`, `<h2>`: headings
+- `<p>`: paragraph text
+- `<label>` + `<input>`: form pairing
+- `<button>`: clickable action
+- `<ul>` + `<li>`: unordered lists
+- `<strong>`: emphasized/important inline text
+
+### What `<style scoped>` means
+
+- `scoped` tells Vue to scope those CSS rules to this component only.
+- Under the hood, Vue rewrites selectors so styles do not leak globally.
+- Use scoped styles for component-local UI.
+- Use non-scoped styles when you intentionally want global styling.
+
+### CSS selector syntax you will see
+
+- `.className` → selects elements by class
+- `#idName` → selects element by id
+- `tagname` (for example `button`) → selects by tag
+- `.parent .child` → descendant selector
+- `.tab-btn.active` → element that has both classes
+- `input[type="number"]` → attribute selector
+
+### Why a period appears in different places
+
+- In CSS, `.` means class selector (`.demo-card`).
+- In JavaScript, `.` means property access (`this.count`).
+
+Same symbol, different language context.
 
 ## How to use snippets.ts
 
@@ -192,6 +237,7 @@ Suggested order (beginner → advanced):
 11. Vue navigation patterns (no-router option vs vue-router option)
 12. Error recognition and debugging mindset (`error-glossary.md`)
 13. Daily debugging habits (`top-10-debugging-habits.md`)
+14. Annotated SFC walkthrough (`vue-sfc-walkthrough.vue`)
 
 How to practice with it:
 

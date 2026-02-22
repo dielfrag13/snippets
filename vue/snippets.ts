@@ -28,7 +28,8 @@
 // If failures need controlled handling -> section 13.
 // If building Vue 2 components/patterns -> section 14.
 // If choosing app navigation strategy -> section 15.
-// If deciding what to expose from this file -> section 16.
+// If learning Vue file anatomy and CSS selector syntax -> section 16.
+// If deciding what to expose from this file -> section 17.
 
 // ---------------------------------
 // 1) Basic function definitions
@@ -633,7 +634,104 @@ export default {
 `;
 
 // ---------------------------------
-// 16) Module exports
+// 16) Vue SFC + HTML/CSS syntax primer
+// ---------------------------------
+
+// Used for: understanding what you are seeing in `.vue` files at a glance.
+// Solves: confusion about mixed template/script/style syntax.
+// Mindset: treat a Vue SFC as three layers in one file:
+// - structure (`<template>`),
+// - behavior/state (`<script>`),
+// - presentation (`<style>`).
+
+const vueSfcAnatomySnippet = `
+<template>
+  <!-- Structure layer (HTML-like template syntax) -->
+  <section class="card">
+    <h2>{{ title }}</h2>
+    <p v-if="isVisible">{{ description }}</p>
+    <button @click="toggle">Toggle</button>
+  </section>
+</template>
+
+<script>
+// Behavior layer (JavaScript)
+export default {
+  name: 'AnatomyExample',
+  data: function () {
+    return {
+      title: 'Vue SFC Anatomy',
+      description: 'Template + Script + Style in one file',
+      isVisible: true
+    };
+  },
+  methods: {
+    toggle: function () {
+      this.isVisible = !this.isVisible;
+    }
+  }
+};
+</script>
+
+<style scoped>
+/* Presentation layer (CSS)
+  scoped means styles apply only to this component (Vue rewrites selectors internally). */
+.card {
+  border: 1px solid #ddd;
+  padding: 12px;
+}
+</style>
+`;
+
+// Common HTML tags you will frequently see in Vue templates.
+const commonHtmlTagsInVueSnippet = `
+<div>Generic container block</div>
+<section>Semantic section of a page/component</section>
+<h1>Main heading</h1>
+<h2>Subheading</h2>
+<p>Paragraph text</p>
+<label>Input caption for accessibility</label>
+<input type="text" />
+<button>Clickable action</button>
+<ul><li>List item</li></ul>
+<strong>Important emphasis</strong>
+`;
+
+// CSS selector quick primer used in `<style>` blocks.
+const cssSelectorPrimerSnippet = `
+/* .class selects elements by class attribute */
+.demo-card { padding: 16px; }
+
+/* #id selects a specific id (generally avoid repeated ids in component trees) */
+#main-panel { margin-top: 12px; }
+
+/* tag selector targets all matching tags */
+button { cursor: pointer; }
+
+/* descendant selector: element with class inside another class */
+.demo-card button { font-weight: 600; }
+
+/* multiple classes on same element */
+.tab-btn.active { background: #e5e5e5; }
+
+/* attribute selector */
+input[type="number"] { width: 120px; }
+`;
+
+// Why the period (.) appears in CSS:
+// - In selectors, `.` means "class" (example: `.card`).
+// - In JavaScript, `.` means "property access" (example: `this.count`).
+// Same character, different language context.
+const dotSyntaxExplanationSnippet = `
+// JavaScript dot syntax:
+this.count = this.count + 1;
+
+/* CSS dot syntax: */
+.count-label { color: #333; }
+`;
+
+// ---------------------------------
+// 17) Module exports
 // ---------------------------------
 
 // Used for: exposing selected symbols for import in other files.
@@ -676,5 +774,9 @@ export {
   vue2NoRouterNavigationSnippet,
   vue2VueRouterNavigationSnippet,
   vue2RoutingDecisionNotes,
-  vue2HashNoRouterSnippet
+  vue2HashNoRouterSnippet,
+  vueSfcAnatomySnippet,
+  commonHtmlTagsInVueSnippet,
+  cssSelectorPrimerSnippet,
+  dotSyntaxExplanationSnippet
 };
